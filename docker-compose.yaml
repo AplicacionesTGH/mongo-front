@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  # aplicacion
+  app:
+    build: .
+    image: tghdev/mongo_front:1.0
+    ports: 
+      - 3000:3000
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017/prueba
+    depends_on:
+      - 'mongodb'
+      - 'rabbitmq'
+    networks:
+      - prueba-net
+
+  # base de datos
+  mongodb:
+    image: mongo:4.4.6
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - prueba-net
+  
+  # sistema de colas
+  rabbitmq:
+    image: rabbitmq:3.11-alpine
+    ports:
+      - '5672:5672'
+    networks:
+      - prueba-net
+
+# volumen donde se guardan los datos    
+volumes:
+  dbdata:
+
+# red para unir ambos componentes
+networks:
+  prueba-net:
+    driver: bridge
